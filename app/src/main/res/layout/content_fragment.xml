@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/ll_content_fragment">
+    <com.yuan.ui.NoScrollViewPager
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/vp_content"/>
+
+    <RadioGroup
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:id="@+id/rg_bottom"
+            android:orientation="horizontal"
+            android:background="@drawable/bottom_tab_bg"
+            android:layout_gravity="center_vertical">
+        <RadioButton
+                style="@style/bottom_rdbtn_style"
+                android:id="@+id/rb_home"
+                android:drawableTop="@drawable/bottom_rbbtn_imagehome_selector"
+                android:gravity="center"
+                android:text="主页"/>
+        <RadioButton
+                style="@style/bottom_rdbtn_style"
+                android:id="@+id/rb_news"
+                android:drawableTop="@drawable/bottom_rbbtn_imagenews_selector"
+                android:gravity="center"
+                android:text="新闻"/>
+        <RadioButton
+                style="@style/bottom_rdbtn_style"
+                android:id="@+id/rb_smart"
+                android:drawableTop="@drawable/bottom_rbbtn_imagesmart_selector"
+                android:gravity="center"
+                android:text="智慧"/>
+        <RadioButton
+                style="@style/bottom_rdbtn_style"
+                android:id="@+id/rb_gov"
+                android:drawableTop="@drawable/bottom_rbbtn_imagegov_selector"
+                android:gravity="center"
+                android:text="政要"/>
+        <RadioButton
+                style="@style/bottom_rdbtn_style"
+                android:id="@+id/rb_setting"
+                android:drawableTop="@drawable/bottom_rbbtn_imagesetting_selector"
+                android:gravity="center"
+                android:text="设置"/>
+    </RadioGroup>
+</LinearLayout>
