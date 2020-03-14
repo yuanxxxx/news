@@ -14,6 +14,7 @@ import com.yuan.bean.NewsTitleBean;
 import com.yuan.bean.TabDetailBean;
 import com.yuan.service.NewsService;
 import com.yuan.ui.HorizontalScrollViewPager;
+import com.yuan.ui.RefreshListView;
 import com.yuan.utils.Constant;
 import com.yuan.utils.DensityUtils;
 import retrofit2.Call;
@@ -35,7 +36,7 @@ public class TabTopicPager {
 
     public NewsTitleBean.DataBean.ChildrenBean newsData;
 
-    public ListView listView;
+    public RefreshListView listView;
     private HorizontalScrollViewPager viewpager;
     private TextView tv_title;
     private LinearLayout ll_point_group;
