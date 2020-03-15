@@ -3,17 +3,17 @@ package com.yuan.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.*;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.yuan.R;
 
-import java.util.zip.Inflater;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static java.text.DateFormat.getDateInstance;
 
 /**
  * @author yuan
@@ -51,6 +51,7 @@ public class RefreshListView extends ListView {
 
     private Animation downAnimation;
     private ProgressBar iv_ring;
+    private onRefreshListener onRefreshListener;
 
     public RefreshListView(Context context) {
         this(context, null);
@@ -135,6 +136,13 @@ public class RefreshListView extends ListView {
                     currentStatus = REFRESHING;
                     changeStateView();
                     ll_refresh_header.setPadding(0, 0, 0, 0);
+
+
+                    // 回调接口
+                    if (onRefreshListener != null) {
+                        onRefreshListener.onDropDownRefresh();
+                    }
+
                 }
                 break;
             default:
@@ -163,5 +171,41 @@ public class RefreshListView extends ListView {
             default:
                 break;
         }
+    }
+
+    /**
+     * 当刷新成功或失败的时候回调该方法
+     * @param success 请求数据是否成功
+     */
+    public void onRefreshFinish(boolean success) {
+        tv_refresh_title.setText("下拉刷新");
+        currentStatus = DROP_DOWN;
+        iv_ring.setVisibility(INVISIBLE);
+        iv_arrow.setVisibility(VISIBLE);
+
+        ll_refresh_header.setPadding(0, -headerHeight, 0, 0);
+
+        if (success) {
+            tv_refresh_time.setText(getCurrentTime());
+        }
+    }
+
+    private String getCurrentTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+        return dateFormat.format(new Date());
+    }
+
+
+    /**
+     * 下拉刷新接口
+     */
+    public interface onRefreshListener {
+
+        public void onDropDownRefresh();
+
+    }
+
+    public void setOnRefreshListener (onRefreshListener listener) {
+        this.onRefreshListener = listener;
     }
 }

@@ -57,6 +57,12 @@ public class TabTopicPager {
         tv_title = (TextView) topnews.findViewById(R.id.tv_title);
         ll_point_group = (LinearLayout) topnews.findViewById(R.id.ll_point_group);
         listView.addHeaderView(topnews);
+        listView.setOnRefreshListener(new RefreshListView.onRefreshListener() {
+            @Override
+            public void onDropDownRefresh() {
+                initData();
+            }
+        });
         rootView = listView;
         initData();
     }
@@ -74,11 +80,12 @@ public class TabTopicPager {
             public void onResponse(Call<TabDetailBean> call, Response<TabDetailBean> response) {
                 TabDetailBean tabDetailBean = response.body();
                 processData(tabDetailBean);
+                listView.onRefreshFinish(true);
             }
 
             @Override
             public void onFailure(Call<TabDetailBean> call, Throwable t) {
-
+                listView.onRefreshFinish(false);
             }
         });
     }
@@ -178,7 +185,7 @@ public class TabTopicPager {
 
         @Override
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            container.removeViewAt(position);
+            container.removeView((View) object);
         }
 
         @Override
