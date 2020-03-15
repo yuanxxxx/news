@@ -8,13 +8,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.shizhefei.view.indicator.Indicator;
 import com.shizhefei.view.indicator.IndicatorViewPager;
 import com.shizhefei.view.indicator.ScrollIndicatorView;
 import com.yuan.R;
+import com.yuan.activity.MainActivity;
 import com.yuan.base.BaseDetailPager;
 import com.yuan.bean.NewsTitleBean;
 import com.yuan.pager.tabpager.TabTopicPager;
+import com.yuan.ui.TouchEventViewPager;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -32,7 +35,7 @@ public class NewsDetailPager extends BaseDetailPager {
     private Indicator indicator;
 
     @BindView(R.id.viewpager)
-    private ViewPager viewPager;
+    private TouchEventViewPager  viewPager;
     private IndicatorViewPager.IndicatorPagerAdapter adapter;
 
     protected NewsDetailPager(Context context, NewsTitleBean.DataBean dataBean) {
@@ -73,14 +76,36 @@ public class NewsDetailPager extends BaseDetailPager {
                 return tabPagers.get(position).rootView;
             }
         };
+
         indicatorViewPager.setAdapter(adapter);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0) {
+                    isSlidingMenuEnabled(SlidingMenu.TOUCHMODE_FULLSCREEN);
+                } else {
+                    isSlidingMenuEnabled(SlidingMenu.TOUCHMODE_NONE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
     public View initView() {
         View view = View.inflate(context, R.layout.news_detail, null);
         indicator = (ScrollIndicatorView) view.findViewById(R.id.viewpagerindicator);
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
+        viewPager = (TouchEventViewPager) view.findViewById(R.id.viewpager);
         indicatorViewPager = new IndicatorViewPager(indicator, viewPager);
         return view;
     }
@@ -88,5 +113,10 @@ public class NewsDetailPager extends BaseDetailPager {
     @Override
     public void initData() {
 
+    }
+
+    private void isSlidingMenuEnabled(int mode) {
+        MainActivity mainActivity = (MainActivity) context;
+        mainActivity.getSlidingMenu().setTouchModeAbove(mode);
     }
 }
