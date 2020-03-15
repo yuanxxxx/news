@@ -21,6 +21,7 @@ import static java.text.DateFormat.getDateInstance;
  */
 public class RefreshListView extends ListView {
 
+
     private TextView tv_refresh_title;
 
     private TextView tv_refresh_time;
@@ -32,6 +33,10 @@ public class RefreshListView extends ListView {
     private ImageView iv_arrow;
 
     private int headerHeight;
+
+    private ProgressBar pb_ring_footer;
+
+    private TextView tv_footer_status;
 
 
     private float startX;
@@ -52,6 +57,9 @@ public class RefreshListView extends ListView {
     private Animation downAnimation;
     private ProgressBar iv_ring;
     private onRefreshListener onRefreshListener;
+    private View footerView;
+    private int footerHeight;
+    private boolean isLoadMore;
 
     public RefreshListView(Context context) {
         this(context, null);
@@ -65,6 +73,19 @@ public class RefreshListView extends ListView {
         super(context, attrs, defStyleAttr);
         initHeaderView(context);
         initAnimation();
+        initFooterView(context);
+    }
+
+    private void initFooterView(Context context) {
+        footerView = View.inflate(context, R.layout.load_more_footer, null);
+        pb_ring_footer = (ProgressBar) footerView.findViewById(R.id.pb_ring_footer);
+        tv_footer_status = (TextView) footerView.findViewById(R.id.tv_footer_status);
+        footerView.measure(0, 0);
+        footerHeight = footerView.getMeasuredHeight();
+        footerView.setPadding(0, -footerHeight, 0, 0);
+        addFooterView(footerView);
+
+        setOnScrollListener(new MyScrollListener());
     }
 
     private void initAnimation() {
@@ -178,15 +199,20 @@ public class RefreshListView extends ListView {
      * @param success 请求数据是否成功
      */
     public void onRefreshFinish(boolean success) {
-        tv_refresh_title.setText("下拉刷新");
-        currentStatus = DROP_DOWN;
-        iv_ring.setVisibility(INVISIBLE);
-        iv_arrow.setVisibility(VISIBLE);
+        if (isLoadMore) {
+            isLoadMore = false;
+            footerView.setPadding(0, -footerHeight, 0, 0);
+        } else {
+            tv_refresh_title.setText("下拉刷新");
+            currentStatus = DROP_DOWN;
+            iv_ring.setVisibility(INVISIBLE);
+            iv_arrow.setVisibility(VISIBLE);
 
-        ll_refresh_header.setPadding(0, -headerHeight, 0, 0);
+            ll_refresh_header.setPadding(0, -headerHeight, 0, 0);
 
-        if (success) {
-            tv_refresh_time.setText(getCurrentTime());
+            if (success) {
+                tv_refresh_time.setText(getCurrentTime());
+            }
         }
     }
 
@@ -203,9 +229,39 @@ public class RefreshListView extends ListView {
 
         public void onDropDownRefresh();
 
+        public void onLoadMore();
+
     }
 
     public void setOnRefreshListener (onRefreshListener listener) {
         this.onRefreshListener = listener;
+    }
+
+
+    class MyScrollListener implements OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            // 静止或惯性滚动时 并且最后一条可见
+            if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_FLING) {
+                if (getLastVisiblePosition() >= getCount() - 1) {
+
+                    // 显示更多布局
+                    footerView.setPadding(8, 8, 8, 8);
+
+                    // 状态改变
+                    isLoadMore = true;
+
+                    // 回调接口
+                    if (onRefreshListener != null) {
+                        onRefreshListener.onLoadMore();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+        }
     }
 }

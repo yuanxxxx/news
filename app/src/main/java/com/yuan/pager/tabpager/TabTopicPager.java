@@ -1,6 +1,7 @@
 package com.yuan.pager.tabpager;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -43,6 +44,9 @@ public class TabTopicPager {
     private List<TabDetailBean.Data.TopNews> topnews;
     private List<TabDetailBean.Data.News> news;
     private int prePosition;
+    private boolean isLoadMore = false;
+    private String moreUrl;
+    private TabDetailListAdapter adapter;
 
     public TabTopicPager(Context context, NewsTitleBean.DataBean.ChildrenBean newsData) {
         this.context = context;
@@ -62,6 +66,12 @@ public class TabTopicPager {
             public void onDropDownRefresh() {
                 initData();
             }
+
+            @Override
+            public void onLoadMore() {
+                isLoadMore = true;
+                initData();
+            }
         });
         rootView = listView;
         initData();
@@ -73,31 +83,66 @@ public class TabTopicPager {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         NewsService newsService = retrofit.create(NewsService.class);
-        String url = newsData.getUrl();
-        Call<TabDetailBean> call = newsService.tabDetails(url.substring(1));
-        call.enqueue(new Callback<TabDetailBean>() {
-            @Override
-            public void onResponse(Call<TabDetailBean> call, Response<TabDetailBean> response) {
-                TabDetailBean tabDetailBean = response.body();
-                processData(tabDetailBean);
-                listView.onRefreshFinish(true);
-            }
+        if (!isLoadMore) {
+            // 正常请求
+            String url = newsData.getUrl();
+            Call<TabDetailBean> call = newsService.tabDetails(url.substring(1));
+            call.enqueue(new Callback<TabDetailBean>() {
+                @Override
+                public void onResponse(Call<TabDetailBean> call, Response<TabDetailBean> response) {
+                    TabDetailBean tabDetailBean = response.body();
+                    processData(tabDetailBean);
+                    listView.onRefreshFinish(true);
+                }
 
-            @Override
-            public void onFailure(Call<TabDetailBean> call, Throwable t) {
-                listView.onRefreshFinish(false);
-            }
-        });
+                @Override
+                public void onFailure(Call<TabDetailBean> call, Throwable t) {
+                    listView.onRefreshFinish(false);
+                }
+            });
+
+        } else {
+            // 加载更多
+            Call<TabDetailBean> call = newsService.moreDetails(moreUrl);
+            call.enqueue(new Callback<TabDetailBean>() {
+                @Override
+                public void onResponse(Call<TabDetailBean> call, Response<TabDetailBean> response) {
+                    TabDetailBean tabDetailBean = response.body();
+                    processData(tabDetailBean);
+                    listView.onRefreshFinish(false);
+                }
+
+                @Override
+                public void onFailure(Call<TabDetailBean> call, Throwable t) {
+                    listView.onRefreshFinish(false);
+                }
+            });
+        }
     }
 
     private void processData(TabDetailBean bean) {
-        topnews = bean.getData().getTopnews();
-        news = bean.getData().getNews();
-        addPoint();
-        tv_title.setText(topnews.get(0).getTitle());
-        viewpager.setAdapter(new TabDetailPagerAdapter());
-        viewpager.addOnPageChangeListener(new MyPagerChangeListener());
-        listView.setAdapter(new TabDetailListAdapter());
+
+        if (TextUtils.isEmpty(bean.getData().getMore())) {
+            moreUrl = "";
+        } else {
+            moreUrl = bean.getData().getMore().substring(1);
+        }
+
+        if (!isLoadMore) {
+            topnews = bean.getData().getTopnews();
+            news = bean.getData().getNews();
+            addPoint();
+            tv_title.setText(topnews.get(0).getTitle());
+            viewpager.setAdapter(new TabDetailPagerAdapter());
+            viewpager.addOnPageChangeListener(new MyPagerChangeListener());
+            adapter = new TabDetailListAdapter();
+            listView.setAdapter(adapter);
+        } else {
+            isLoadMore = false;
+            news.addAll(bean.getData().getNews());
+            adapter.notifyDataSetChanged();
+        }
+
     }
 
     class MyPagerChangeListener implements ViewPager.OnPageChangeListener {

@@ -12,6 +12,9 @@ public interface NewsService {
     @GET("static/api/news/categories.json")
     Call<NewsTitleBean> getInitialInfo();
 
-    @GET()
+    @GET
     Call<TabDetailBean> tabDetails(@Url String url);
+
+    @GET
+    Call<TabDetailBean> moreDetails(@Url String url);
 }
