@@ -60,6 +60,8 @@ public class RefreshListView extends ListView {
     private View footerView;
     private int footerHeight;
     private boolean isLoadMore;
+    private View topNews;
+    private int listViewOnScreenY = -1;
 
     public RefreshListView(Context context) {
         this(context, null);
@@ -128,6 +130,14 @@ public class RefreshListView extends ListView {
                     startY = ev.getY();
                 }
 
+                boolean isDisplayTop = isDisplayTopNews();
+
+                if (!isDisplayTop) {
+                    // 加载更多
+                    break;
+                }
+
+
                 if (currentStatus == REFRESHING) {
                     break;
                 }
@@ -171,6 +181,19 @@ public class RefreshListView extends ListView {
         }
 
         return super.onTouchEvent(ev);
+    }
+
+    private boolean isDisplayTopNews() {
+        int[] locations = new int[2];
+        if (listViewOnScreenY == -1) {
+            getLocationOnScreen(locations);
+            listViewOnScreenY = locations[1];
+        }
+
+        topNews.getLocationOnScreen(locations);
+        int topNewsOnScreenY = locations[1];
+
+        return listViewOnScreenY <= topNewsOnScreenY;
     }
 
     private void changeStateView() {
@@ -219,6 +242,14 @@ public class RefreshListView extends ListView {
     private String getCurrentTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
         return dateFormat.format(new Date());
+    }
+
+    public void addHeaderTopNewsView(View topnews) {
+        topNews = topnews;
+
+        if (topNews != null) {
+            ll_header_view.addView(topnews);
+        }
     }
 
 

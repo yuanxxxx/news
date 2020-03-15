@@ -60,7 +60,7 @@ public class TabTopicPager {
         viewpager = (HorizontalScrollViewPager) topnews.findViewById(R.id.viewpager);
         tv_title = (TextView) topnews.findViewById(R.id.tv_title);
         ll_point_group = (LinearLayout) topnews.findViewById(R.id.ll_point_group);
-        listView.addHeaderView(topnews);
+        listView.addHeaderTopNewsView(topnews);
         listView.setOnRefreshListener(new RefreshListView.onRefreshListener() {
             @Override
             public void onDropDownRefresh() {
