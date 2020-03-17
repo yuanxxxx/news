@@ -1,6 +1,7 @@
 package com.yuan.pager.tabpager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.yuan.R;
+import com.yuan.activity.NewsDetailActivity;
 import com.yuan.bean.NewsTitleBean;
 import com.yuan.bean.TabDetailBean;
 import com.yuan.service.NewsService;
@@ -18,8 +20,8 @@ import com.yuan.ui.HorizontalScrollViewPager;
 import com.yuan.ui.RefreshListView;
 import com.yuan.utils.CacheUtils;
 import com.yuan.utils.Constant;
+import com.yuan.utils.Constants;
 import com.yuan.utils.DensityUtils;
-import okhttp3.Cache;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -165,6 +167,12 @@ public class TabTopicPager {
                 CacheUtils.putString(context, NEWS_CLICKED, news_clicked);
                 adapter.notifyDataSetChanged();
             }
+
+            // 跳转页面
+            Intent intent = new Intent(context, NewsDetailActivity.class);
+            String url = Constant.BASE_URL + newsEntity.getUrl().substring(1);
+            intent.putExtra("url", url);
+            context.startActivity(intent);
         }
     }
 
