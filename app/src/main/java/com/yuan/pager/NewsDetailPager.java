@@ -1,6 +1,7 @@
 package com.yuan.pager;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.shizhefei.view.indicator.Indicator;
 import com.shizhefei.view.indicator.IndicatorViewPager;
 import com.shizhefei.view.indicator.ScrollIndicatorView;
+import com.shizhefei.view.indicator.slidebar.ColorBar;
 import com.yuan.R;
 import com.yuan.activity.MainActivity;
 import com.yuan.base.BaseDetailPager;
@@ -23,6 +25,9 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author yuan
+ */
 public class NewsDetailPager extends BaseDetailPager {
 
     private final NewsTitleBean.DataBean generalInfos;
@@ -78,6 +83,7 @@ public class NewsDetailPager extends BaseDetailPager {
         };
 
         indicatorViewPager.setAdapter(adapter);
+        indicatorViewPager.setIndicatorScrollBar(new ColorBar(context, Color.RED, 2));
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

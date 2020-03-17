@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.jeremyfeinstein.slidingmenu.lib.CustomViewAbove;
 import com.yuan.R;
 import com.yuan.bean.NewsTitleBean;
 import com.yuan.bean.TabDetailBean;

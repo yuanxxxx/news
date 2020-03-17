@@ -13,8 +13,6 @@ import com.yuan.R;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static java.text.DateFormat.getDateInstance;
-
 /**
  * @author yuan
  * @date 2020/3/14 15:35
