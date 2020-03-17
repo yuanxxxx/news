@@ -1,6 +1,7 @@
 package com.yuan.pager.tabpager;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,10 @@ import com.yuan.bean.TabDetailBean;
 import com.yuan.service.NewsService;
 import com.yuan.ui.HorizontalScrollViewPager;
 import com.yuan.ui.RefreshListView;
+import com.yuan.utils.CacheUtils;
 import com.yuan.utils.Constant;
 import com.yuan.utils.DensityUtils;
+import okhttp3.Cache;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,6 +33,7 @@ import java.util.List;
  */
 public class TabTopicPager {
 
+    public static final String NEWS_CLICKED = "news_clicked";
     public View rootView;
 
     public Context context;
@@ -136,6 +140,7 @@ public class TabTopicPager {
             viewpager.addOnPageChangeListener(new MyPagerChangeListener());
             adapter = new TabDetailListAdapter();
             listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new MyOnItemClickListener());
         } else {
             isLoadMore = false;
             news.addAll(bean.getData().getNews());
@@ -143,6 +148,26 @@ public class TabTopicPager {
         }
 
     }
+
+    class MyOnItemClickListener implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            int realPosition = position - 1;
+
+            TabDetailBean.Data.News newsEntity = news.get(realPosition);
+
+            int newsId = newsEntity.getId();
+
+            String news_clicked = CacheUtils.getString(context, NEWS_CLICKED);
+
+            if (!news_clicked.contains(String.valueOf(newsId))) {
+                news_clicked = news_clicked + newsId + ",";
+                CacheUtils.putString(context, NEWS_CLICKED, news_clicked);
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
 
     class MyPagerChangeListener implements ViewPager.OnPageChangeListener {
         @Override
@@ -202,6 +227,12 @@ public class TabTopicPager {
             viewHolder.iv_icon.setImageURI(imageUrl);
             viewHolder.tv_title.setText(newsData.getTitle());
             viewHolder.tv_time.setText(newsData.getPubdate());
+            String newsClicked = CacheUtils.getString(context, NEWS_CLICKED);
+            if (newsClicked.contains(String.valueOf(newsData.getId()))) {
+                viewHolder.tv_title.setTextColor(Color.GRAY);
+            } else {
+                viewHolder.tv_title.setTextColor(Color.BLACK);
+            }
 
             return convertView;
         }
